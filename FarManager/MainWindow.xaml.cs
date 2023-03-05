@@ -31,8 +31,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = this;
-        var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-        //string path = System.IO.Path.GetPathRoot(Environment.SystemDirectory);
+        string path = System.IO.Path.GetPathRoot(Environment.SystemDirectory);
         DirectoryInfo directory = new(path);
 
         foreach (var d in directory.GetDirectories())
