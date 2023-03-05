@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ public partial class MainWindow : Window
     public ICommand OpenCommand { get; set; }
     public ICommand DeleteCommand { get; set; }
     public ICommand ButtonCommand { get; set; }
+    public ICommand CopyCommand { get; set; }
     public MainWindow()
     {
         InitializeComponent();
@@ -31,8 +33,6 @@ public partial class MainWindow : Window
         var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         //string path = System.IO.Path.GetPathRoot(Environment.SystemDirectory);
         DirectoryInfo directory = new(path);
-
-        //parent = directory?.Parent.FullName;
 
         foreach (var d in directory.GetDirectories())
         {
@@ -48,6 +48,30 @@ public partial class MainWindow : Window
         OpenCommand = new RelayCommand(ExecuteOpenCommand);
         DeleteCommand = new RelayCommand(ExecuteDeleteCommand);
         ButtonCommand = new RelayCommand(ExecuteButtonCommand);
+        CopyCommand = new RelayCommand(ExecuteCopyCommand);
+    }
+
+    private void ExecuteCopyCommand(object? obj)
+    {
+        if(obj is ListBox lb)
+        {
+            List<string> file_list = new List<string>
+            {
+                lb.SelectedItem.ToString()
+            };
+            Clipboard.Clear();
+            Clipboard.SetData(DataFormats.FileDrop, file_list.ToArray());
+            //StringCollection paths = new StringCollection
+            //{
+            //    lb.SelectedItem.ToString()
+            //};
+            ////Clipboard.SetFileDropList(paths);
+            //Clipboard.SetData(DataFormats.FileDrop,paths);
+            string[] file_names = (string[])
+            Clipboard.GetData(DataFormats.FileDrop);
+            MessageBox.Show(file_names[0]);
+        }
+        
     }
 
     private void ExecuteButtonCommand(object? obj)
