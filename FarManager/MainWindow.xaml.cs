@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     public ICommand DeleteCommand { get; set; }
     public ICommand ButtonCommand { get; set; }
     public ICommand CopyCommand { get; set; }
+    public ICommand PasteCommand { get; set; }
     public MainWindow()
     {
         InitializeComponent();
@@ -49,6 +50,18 @@ public partial class MainWindow : Window
         DeleteCommand = new RelayCommand(ExecuteDeleteCommand);
         ButtonCommand = new RelayCommand(ExecuteButtonCommand);
         CopyCommand = new RelayCommand(ExecuteCopyCommand);
+        PasteCommand = new RelayCommand(ExecutePasteCommand);
+    }
+
+    private void ExecutePasteCommand(object? obj)
+    {
+        if (obj is ListBox lb)
+        {
+            string[] file_names = (string[])
+            Clipboard.GetData(DataFormats.FileDrop);
+            var filename = System.IO.Path.GetFileName(file_names[0]);
+            File.Copy(file_names[0],lb.SelectedItem.ToString()+"/"+filename);
+        }
     }
 
     private void ExecuteCopyCommand(object? obj)
@@ -61,15 +74,8 @@ public partial class MainWindow : Window
             };
             Clipboard.Clear();
             Clipboard.SetData(DataFormats.FileDrop, file_list.ToArray());
-            //StringCollection paths = new StringCollection
-            //{
-            //    lb.SelectedItem.ToString()
-            //};
-            ////Clipboard.SetFileDropList(paths);
-            //Clipboard.SetData(DataFormats.FileDrop,paths);
-            string[] file_names = (string[])
-            Clipboard.GetData(DataFormats.FileDrop);
-            MessageBox.Show(file_names[0]);
+            MessageBox.Show("File successfully copied to clipboard");
+
         }
         
     }
