@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +23,7 @@ public partial class MainWindow : Window
     string parent = null;
     public ICommand OpenCommand { get; set; }
     public ICommand DeleteCommand { get; set; }
+    public ICommand ButtonCommand { get; set; }
     public MainWindow()
     {
         InitializeComponent();
@@ -45,7 +47,34 @@ public partial class MainWindow : Window
         }
         OpenCommand = new RelayCommand(ExecuteOpenCommand);
         DeleteCommand = new RelayCommand(ExecuteDeleteCommand);
+        ButtonCommand = new RelayCommand(ExecuteButtonCommand);
     }
+
+    private void ExecuteButtonCommand(object? obj)
+    {
+        if (obj is ListBox lb)
+        {
+            var directory = new DirectoryInfo(parent);
+            parent = directory.Parent?.FullName;
+            try
+            {
+                var directories = directory.GetDirectories();
+                var files = directory.GetFiles();
+                lb.Items.Clear();
+                foreach (var d in directories)
+                    lb.Items.Add(d);
+
+                foreach (var f in files)
+                    lb.Items.Add(f);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Access Denied");
+                return;
+            }
+        }
+    }
+
     private void ExecuteDeleteCommand(object? obj)
     {
        
@@ -87,8 +116,32 @@ public partial class MainWindow : Window
     {
         if (obj is ListBox lb)
         {
-            MessageBox.Show(lb.SelectedItem.ToString());
 
+            if (lb.SelectedItem is DirectoryInfo directory)
+            {
+                parent = directory.Parent.FullName;
+                try
+                {
+                    var directories = directory.GetDirectories();
+                    var files = directory.GetFiles();
+                    lb.Items.Clear();
+                    foreach (var d in directories)
+                        lb.Items.Add(d);
+
+                    foreach (var f in files)
+                        lb.Items.Add(f);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Access Denied");
+                    return;
+                }
+            }
+            else if (lb.SelectedItem is FileInfo file)
+            {
+                parent = file.Directory.FullName;
+                Process.Start(new ProcessStartInfo { FileName = file.FullName, UseShellExecute = true });
+            }
 
         }
     }
