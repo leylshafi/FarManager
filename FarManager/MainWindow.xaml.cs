@@ -1,21 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FarManager;
 
@@ -31,7 +21,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = this;
-        string path = System.IO.Path.GetPathRoot(Environment.SystemDirectory);
+        string path = Path.GetPathRoot(Environment.SystemDirectory);
         DirectoryInfo directory = new(path);
 
         foreach (var d in directory.GetDirectories())
@@ -52,20 +42,21 @@ public partial class MainWindow : Window
         PasteCommand = new RelayCommand(ExecutePasteCommand);
     }
 
-    private void ExecutePasteCommand(object? obj)
+    private async void ExecutePasteCommand(object? obj)
     {
         if (obj is ListBox lb)
         {
             string[] file_names = (string[])
             Clipboard.GetData(DataFormats.FileDrop);
             var filename = System.IO.Path.GetFileName(file_names[0]);
-            File.Copy(file_names[0],lb.SelectedItem.ToString()+"/"+filename);
+            await Task.Delay(50);
+            File.Copy(file_names[0], lb.SelectedItem.ToString() + "/" + filename);
         }
     }
 
     private void ExecuteCopyCommand(object? obj)
     {
-        if(obj is ListBox lb)
+        if (obj is ListBox lb)
         {
             List<string> file_list = new List<string>
             {
@@ -76,37 +67,42 @@ public partial class MainWindow : Window
             MessageBox.Show("File successfully copied to clipboard");
 
         }
-        
+
     }
 
-    private void ExecuteButtonCommand(object? obj)
+    private async void ExecuteButtonCommand(object? obj)
     {
         if (obj is ListBox lb)
         {
-            var directory = new DirectoryInfo(parent);
-            parent = directory.Parent?.FullName;
-            try
+            if (parent is not null)
             {
-                var directories = directory.GetDirectories();
-                var files = directory.GetFiles();
-                lb.Items.Clear();
-                foreach (var d in directories)
-                    lb.Items.Add(d);
+                var directory = new DirectoryInfo(parent);
+                parent = directory.Parent?.FullName;
+                try
+                {
+                    var directories = directory.GetDirectories();
+                    var files = directory.GetFiles();
+                    lb.Items.Clear();
 
-                foreach (var f in files)
-                    lb.Items.Add(f);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Access Denied");
-                return;
+                    await Task.Delay(50);
+                    foreach (var d in directories)
+                        lb.Items.Add(d);
+
+                    foreach (var f in files)
+                        lb.Items.Add(f);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Access Denied");
+                    return;
+                }
             }
         }
     }
 
-    private void ExecuteDeleteCommand(object? obj)
+    private async void ExecuteDeleteCommand(object? obj)
     {
-       
+
         if (obj is ListBox lb)
         {
             var item = lb.SelectedItem;
@@ -129,7 +125,7 @@ public partial class MainWindow : Window
                 if (item is FileInfo file)
                     file.Delete();
 
-
+                await Task.Delay(50);
                 LeftItems.Items.Remove(item);
                 RightItems.Items.Remove(item);
             }
@@ -141,7 +137,7 @@ public partial class MainWindow : Window
 
         }
     }
-    private void ExecuteOpenCommand(object? obj)
+    private async void ExecuteOpenCommand(object? obj)
     {
         if (obj is ListBox lb)
         {
@@ -154,6 +150,8 @@ public partial class MainWindow : Window
                     var directories = directory.GetDirectories();
                     var files = directory.GetFiles();
                     lb.Items.Clear();
+
+                    await Task.Delay(50);
                     foreach (var d in directories)
                         lb.Items.Add(d);
 
@@ -174,5 +172,4 @@ public partial class MainWindow : Window
 
         }
     }
-
 }

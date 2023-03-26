@@ -46,7 +46,7 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
-        <Button Grid.Column="1" Height="40" VerticalAlignment="Top" Margin="0 10" BorderBrush="{x:Null}" Command="{Binding ButtonCommand}" CommandParameter="{Binding ElementName=LeftItems}" >
+        <Button Grid.Column="1" Height="40" VerticalAlignment="Top" Margin="0 10" BorderBrush="{x:Null}" Command="{Binding ButtonCommand}" CommandParameter="{Binding ElementName=LeftItems}">
             <Button.Background>
                 <ImageBrush ImageSource="/icons8-back-arrow-96.png" Stretch="Uniform"/>
             </Button.Background>
